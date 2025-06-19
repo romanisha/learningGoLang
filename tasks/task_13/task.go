@@ -79,7 +79,7 @@ func slices() {
 }
 
 func PrintPlease(t any) {
-	fmt.Printf("Тип: %T, Значение %#v\n", t, t)
+	fmt.Printf("ТИП: %T, Значение %#v\n", t, t)
 }
 
 func GetIndex(i, v any) {
