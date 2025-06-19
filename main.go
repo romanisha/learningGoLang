@@ -1,9 +1,9 @@
 package main
 
 import (
-	"LearnGo/tasks/task_12"
+	"LearnGo/tasks/task_13"
 )
 
 func main() {
-	task_12.Run()
+	task_13.Run()
 }
