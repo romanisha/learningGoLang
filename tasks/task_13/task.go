@@ -3,9 +3,14 @@ package task_13
 import "fmt"
 
 func Run() {
-	arrays()
-	slices()
-	convertToArrayPointer()
+	//arrays()
+	//slices()
+	//convertToArrayPointer()
+	//passToFunction()
+	//getSlice()
+	//copySlice()
+	deleteElements()
+
 }
 
 type Person struct {
@@ -87,8 +92,17 @@ func slices() {
 	// второй вариант создание слайсов - использование литералов
 	stringSliceLiteral := []string{"First", "Second"}
 	PrintPlease(stringSliceLiteral)
-	fmt.Printf("Lenght: %d, Capacity %d\n", len(stringSliceLiteral), cap(stringSliceLiteral))
+	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(stringSliceLiteral), cap(stringSliceLiteral))
 	//Длина слайса= кол-воэлементов, капасити - максимальная вместимость слайса до тех как заново будет переаллоцирована память
+
+	// Создание слайса через функцию new, но это очень неудобно
+	slicePointer := new([]int)
+	PrintPlease(slicePointer)
+	getLength(*slicePointer)
+
+	newSlice2 := append(*slicePointer, 1, 2, 3)
+	PrintPlease(newSlice2)
+	getLength(newSlice2)
 
 	//Создание слайса с помощью make
 	sliceByMake := make([]int, 0, 5) // длина слайса - 0, 5 - вместимост слайса
@@ -132,6 +146,67 @@ func slices() {
 
 }
 
+// получение слайса из массива, получение слайса из слайса
+// в го существует специальная операция  получения слайса, слайс можем получать как на основе массива, так и на основе др. слайса
+// у нас есть массив и мы хотим слайс на основе этого масива
+func getSlice() {
+
+	intArr := [...]int{1, 2, 3, 4, 5}
+	PrintPlease(intArr)
+
+	//Реслайсинг (1 способ получение слацса из массива)
+	intSlice := intArr[1:3] //мы создаем слайс от элемента с индексом 1 (включая) до элемента с индексом 4 (не включая)
+	PrintPlease(intSlice)
+	getLength(intSlice) // капасити в данном случае считается от выбранного элемента до конца ИСХОДНОГО массива
+
+	fullSlice := intArr[:] // такая запись берет ВСЕ значения int[0:5]
+	PrintPlease(fullSlice)
+	getLength(fullSlice)
+
+	sliceFromSlice := fullSlice[0:3] // слайсот другого слайса
+	PrintPlease(sliceFromSlice)
+	getLength(sliceFromSlice)
+
+	//все слайсы ссылаются на исходный массив, поэтому изменив значение в массиве, мы также их увидим во всех последующих от него слайсов
+	intArr[2] = 500
+	PrintPlease(intArr)
+	PrintPlease(intSlice)
+	PrintPlease(fullSlice)
+	PrintPlease(sliceFromSlice)
+}
+
+// КОПИРОВАНИЕ СЛАЙСОВ
+func copySlice() {
+	destination := make([]string, 0, 2)
+	sourse := []string{"Vasya", "Petya", "Katya"}
+
+	makeCopy(destination, sourse) // в данном случае копирование не произойдет
+	PrintPlease(destination)      //и нас дестинейшен не изменится
+	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(destination), cap(destination))
+
+	destination = make([]string, 2, 3)
+	makeCopy(destination, sourse) // копируется столько значений, сколько у нашего слайса длины, у нас 2 - скорировалось 2
+	PrintPlease(destination)      // капасити в данном случае вообще не при чем
+	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(destination), cap(destination))
+
+	destination = make([]string, len(sourse)) // тк нам нужно скопировать весь source, то выставляем длину source
+	makeCopy(destination, sourse)
+	PrintPlease(destination)
+	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(destination), cap(destination))
+
+	var defaultSlice []string // ниловый слайс
+	PrintPlease(defaultSlice)
+	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(defaultSlice), cap(defaultSlice))
+
+	makeCopy(defaultSlice, sourse) //после копирования ниловый слайс таким и останется
+	PrintPlease(defaultSlice)
+	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(defaultSlice), cap(defaultSlice))
+
+	//для копирования данных в дефолтный слайс мы можем исполтзовать связку мейка и аппенда
+	rightSlice := append(make([]string, 0, len(sourse)), sourse...)
+	PrintPlease(rightSlice)
+	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(rightSlice), cap(rightSlice))
+}
 func convertToArrayPointer() {
 	initialSlice := []int{1, 2}
 	PrintPlease(initialSlice)
@@ -140,7 +215,33 @@ func convertToArrayPointer() {
 	intArray := (*[2]int)(initialSlice) //конвертация слайса в указатель на массив.
 	// Чтобы это сработало нужно, чтобы длина массива совпадала с длиной слайса
 	PrintPlease(intArray)
-	fmt.Printf("Lenght: %d, Capacity %d\n", intArray, intArray)
+	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(intArray), cap(intArray))
+}
+
+// удаление элемента из слайса
+func deleteElements() {
+
+}
+
+// передача слайса в функцию. В ГО все передается по значению
+func passToFunction() {
+	initialSlice := []int{1, 2}
+	PrintPlease(initialSlice)
+	getLength(initialSlice)
+
+	changeValue(initialSlice) //тк слайс содержит указатель на массив, значит изменяя значение в нашес слайсе
+	// то мы меняем значение  и в исходном масиве
+	PrintPlease(initialSlice)
+	getLength(initialSlice)
+
+	//initialSlice = append(initialSlice, 3) // добавляем элементы слайса и исходный сдайс перезаписывается
+	newSlice := append(initialSlice, 3)
+	PrintPlease(newSlice)
+	getLength(newSlice)
+
+	newSlice = appendValue(newSlice)
+	PrintPlease(newSlice)
+	getLength(newSlice)
 }
 
 // Функции с неограниченным числом параметров ( Variadic function)
@@ -155,12 +256,20 @@ func showAllElements(values ...int) {
 	fmt.Println()
 }
 
-func PrintPlease(t any) {
-	fmt.Printf("ТИП: %T, Значение %#v\n", t, t)
+func appendValue(slice []int) []int {
+	slice = append(slice, 4, 5)
+	PrintPlease(slice)
+	getLength(slice)
+
+	return slice
 }
 
-func GetIndex(i, v any) {
-	fmt.Printf("Index: %d, Value: %v\n", i, v)
+func changeValue(slice []int) {
+	slice[1] = 15
+}
+
+func PrintPlease(t any) {
+	fmt.Printf("ТИП: %T, Значение %#v\n", t, t)
 }
 
 func ChangeArray(arr [3]int) [3]int {
@@ -168,6 +277,14 @@ func ChangeArray(arr [3]int) [3]int {
 	return arr
 }
 
+func GetIndex(i, v any) {
+	fmt.Printf("Index: %d, Value: %v\n", i, v)
+}
+
 func getLength(l []int) {
 	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(l), cap(l))
+}
+
+func makeCopy(d, s []string) {
+	fmt.Printf("Copied %v\n", copy(d, s))
 }
