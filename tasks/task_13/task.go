@@ -218,9 +218,25 @@ func convertToArrayPointer() {
 	fmt.Printf("Lenght: %d, Capacity %d\n\n", len(intArray), cap(intArray))
 }
 
-// удаление элемента из слайса
+// Удаление элемента из слайса
 func deleteElements() {
+	slice := []int{1, 2, 3, 4, 5}
+	i := 2
+	PrintPlease(slice)
+	getLength(slice)
 
+	//1ый способ удаления через append, но он ломает исходный слайс
+	withAppend := append(slice[:i], slice[i+1:]...) //  те мы берем до 2ого элемента и после третьего до конца
+	PrintPlease(withAppend)
+	getLength(withAppend)
+	PrintPlease(slice) // ломает исходный слайс,чтобы этого не было лучше переприсваивать исходный слайс (не использовать новый слвй слайс )
+
+	slice = []int{1, 2, 3, 4, 5}
+
+	withCopy := slice[:i+copy(slice[i:], slice[i+1:])] //ломает исходный слайс, чтобы этого не было меняем withCopy на slice и работаем с одним слайсом
+	//slice = slice[:i+copy(slice[i:], slice[i+1:])]
+	PrintPlease(withCopy)
+	fmt.Println(slice)
 }
 
 // передача слайса в функцию. В ГО все передается по значению
