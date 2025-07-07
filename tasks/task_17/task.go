@@ -17,7 +17,7 @@ func baseSelect() {
 	bufferedChan := make(chan string, 3) //1
 	bufferedChan <- "first"
 
-	select { //свитч кейс для работв с каналами,различает три типа операции block, unblock, default
+	select { //свитч кейс для работы с каналами,различает три типа операции block, unblock, default
 	// в первую очередь селект анализирует все наши case и ищет Неблокирующие операции! если их несколько он возьмет их в рандомном порядке
 	case str := <-bufferedChan: //это непблокирующая операция, тк в буфере значение есть и мы хотим прочитать
 		fmt.Println("read", str)
