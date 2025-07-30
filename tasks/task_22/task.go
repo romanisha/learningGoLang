@@ -4,11 +4,18 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 func Run() {
 	//OsFile()
-	output()
+	//output()
+	//input()
+	//args()
+	//createFile()
+	//writeTo()
+	fmt.Println(reverseStr("abcdefgh", 0))
+
 }
 
 // работа с файлами пакет OS
@@ -98,4 +105,131 @@ func output() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func input() {
+	var ( //  у на  есть две переменные
+		text  string
+		text2 string
+	)
+
+	count, err := fmt.Scan(&text, &text2) //функция для считывания даных с клавиатуры
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(text, text2, count) //скан счмтал наши данные во внутрь переменных и посчитал кол-во аругментов
+
+	count, err = fmt.Fscan(os.Stdin, &text, &text2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(text, text2, count)
+
+	file, err := os.Open("test_file.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		if err = file.Close(); err != nil {
+		}
+	}()
+
+	count, err = fmt.Fscanln(file, &text) // достает построчно, возвращает кол-во переменных
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(text, count)
+}
+
+// передача аргументов программе при запуске
+func args() {
+	for _, arg := range os.Args {
+		fmt.Println(arg)
+	}
+}
+
+// изучение интерфейсов io.ReadFrom ioWriteTo
+func createFile() {
+	start := time.Now()
+
+	file, err := os.Create("test_file2.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var i int
+
+	for i < 100 {
+		if _, err = file.WriteString(fmt.Sprintf("%d\n", i)); err != nil { // ` записываем в файл 100 строк
+			log.Fatal(err)
+		}
+		i++
+	}
+
+	if err = file.Close(); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Created file in ", time.Since(start))
+}
+
+func writeTo() { // интерфейс в пакете IO, дапустим есть файл, и мы хотим читать его в консоль в stdout
+	file, err := os.Open("test_file2.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		if err = file.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	count, err := file.WriteTo(os.Stdout) // записываем файл в консоль stdout
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(count) // после счетчика выводится кол-во байт
+}
+
+func reverseStr(s string, k int) string {
+	if k == 0 || k == 1 {
+		return s
+	}
+
+	//var newString []byte
+	var newString string
+	tf := true
+	for i := 0; i < len(s); i = i + k {
+
+		firstIndex := i
+		lastIndex := i + k
+
+		if lastIndex > len(s) {
+			lastIndex = len(s)
+		}
+
+		if tf {
+			newString = newString + reverse(s[firstIndex:lastIndex])
+			tf = false
+		} else {
+			newString = newString + s[firstIndex:lastIndex]
+			tf = true
+		}
+
+	}
+
+	return newString
+}
+
+func reverse(r string) string {
+	var newR string
+	for i := len(r) - 1; i >= 0; i-- {
+
+		newR = newR + string(r[i])
+	}
+
+	return newR
 }

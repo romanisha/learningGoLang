@@ -1,10 +1,11 @@
 package main
 
 import (
-	"LearnGo/tasks/task_22"
+	"LearnGo/leetcode/task_136"
 )
 
 func main() {
 	//ex1.Run()
-	task_22.Run()
+	//task_22.Run()
+	task_136.Run()
 }
